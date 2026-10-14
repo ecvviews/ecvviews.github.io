@@ -208,16 +208,16 @@
 <script>
   async function fetchLiveWatchdogData() {
     try {
-      const masterGistApiUrl = "https://github.com";
-      const proxyUrl = "https://allorigins.win" + encodeURIComponent(masterGistApiUrl) + "&_nocache=" + new Date().getTime();
+      // Bypassing API caching entirely by pulling the clean raw text endpoint directly
+      const rawGistUrl = "https://githubusercontent.com" + new Date().getTime();
+      const proxyUrl = "https://allorigins.win" + encodeURIComponent(rawGistUrl);
       
       const response = await fetch(proxyUrl);
-      if (!response.ok) throw new Error("API Proxy Connection Failure");
+      if (!response.ok) throw new Error("Proxy connection down");
       const wrapper = await response.json();
       
-      // Unpack the wrapper data container safely
-      const telemetry = JSON.parse(wrapper.contents);
-      const data = JSON.parse(telemetry.files["street_stats.json"].content);
+      // Parse the clean string metrics payload natively
+      const data = JSON.parse(wrapper.contents);
 
       document.getElementById("trailer-status").innerText = data.trailer_status || "Offline";
       document.getElementById("current-spot").innerText = data.current_spot || "Unknown Spot";
@@ -252,7 +252,7 @@
   }
 
   fetchLiveWatchdogData();
-  setInterval(fetchLiveWatchdogData, 15000); // Check updates every 15 seconds
+  setInterval(fetchLiveWatchdogData, 15000); // 15-second tracking interval
 </script>
 
 </body>
