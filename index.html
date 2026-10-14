@@ -46,7 +46,7 @@
 
     .header-title {
       color: #991b1b;
-      font-size: 17px;
+      font-size: 16px;
       font-weight: 800;
       text-transform: uppercase;
       margin: 0;
@@ -131,9 +131,6 @@
       font-size: 12.5px;
       padding: 5px 0;
       color: #334155;
-      display: flex;
-      align-items: flex-start;
-      gap: 6px;
     }
 
     .footer-row {
@@ -151,9 +148,6 @@
       font-weight: 700;
       text-decoration: none;
     }
-    .sync-link:hover {
-      text-decoration: underline;
-    }
 
     .video-badge-btn {
       display: inline-flex;
@@ -167,10 +161,6 @@
       font-weight: 700;
       margin-top: 10px;
       border: 1px solid #b91c1c;
-      transition: background 0.15s ease;
-    }
-    .video-badge-btn:hover {
-      background: #b91c1c;
     }
   </style>
 </head>
@@ -182,24 +172,20 @@
     <div class="header-sub">Surveillance Telemetry & Blocker Fleet Ledger</div>
   </div>
 
-  <!-- Primary Trailer Telemetry Cluster -->
   <div class="data-row"><span class="data-label">Trailer Status:</span><span class="data-value" id="trailer-status" style="color: var(--text-main);">Syncing...</span></div>
   <div class="data-row"><span class="data-label">Current Spot:</span><span class="data-value" id="current-spot" style="color: var(--text-muted);">Syncing...</span></div>
   <div class="data-row"><span class="data-label">Trailer Current Duration:</span><span class="data-value" id="trailer-duration">0.0 hours</span></div>
 
-  <!-- Impact Banner -->
   <div class="alert-banner">
     <span class="alert-text">🚨 Cumulative Blockade Impact:</span>
     <span class="alert-badge" id="cumulative-impact">0.0 hrs</span>
   </div>
 
-  <!-- Blocker Fleet Active Manifest -->
   <div class="data-row"><span class="data-label">Active Blocker Occupant:</span><span class="data-value" id="active-blocker" style="color: var(--alert-red);">Syncing...</span></div>
   <div class="data-row"><span class="data-label">Blocker Stay Odometer:</span><span class="data-value" id="blocker-duration" style="color: var(--alert-red);">0.0 hours</span></div>
   <div class="data-row"><span class="data-label">Forward Spaces Status:</span><span class="data-value" id="forward-status">Syncing...</span></div>
   <div class="data-row"><span class="data-label">Forward Vehicles Activity:</span><span class="data-value" id="forward-activity">Syncing...</span></div>
 
-  <!-- Historical Inventory Registers -->
   <div class="section-box">
     <h4 class="section-title">📋 Historical Blocker Tracking Timelines</h4>
     <div class="timeline-item">🔴 <span style="font-weight:600;">Vehicle 1 (Tesla):</span> <span id="v1-status">Syncing...</span></div>
@@ -207,7 +193,6 @@
     <div class="timeline-item">🟢 <span style="font-weight:600;">Vehicle 3 (Truck):</span> <span id="v3-status">Syncing...</span></div>
   </div>
 
-  <!-- Log Book Append Sub-Panel -->
   <div class="section-box">
     <h4 class="section-title">🔄 Shift Swap Manifest History</h4>
     <div id="manifest-history" style="font-size:12.5px; color: #334155; line-height: 1.5;">Loading logs...</div>
@@ -223,34 +208,33 @@
 <script>
   async function fetchLiveWatchdogData() {
     try {
-      // Bypassing CORS constraints using direct data stream objects
-      const targetGistRawUrl = "https://githubusercontent.com" + new Date().getTime();
+      const targetGistRawUrl = "https://github.com";
       const response = await fetch(targetGistRawUrl);
       if (!response.ok) throw new Error("API Gateway Timeout");
       const telemetry = await response.json();
+      
+      // Parse the nested JSON text directly out of the Gist files model
+      const data = JSON.parse(telemetry.files["street_stats.json"].content);
 
-      // Dynamic Node Injections
-      document.getElementById("trailer-status").innerText = telemetry.trailer_status || "Offline";
-      document.getElementById("current-spot").innerText = telemetry.current_spot || "Unknown Coordinates";
-      document.getElementById("trailer-duration").innerText = (telemetry.trailer_hours_in_spot || 0).toFixed(1) + " hours";
-      document.getElementById("cumulative-impact").innerText = (telemetry.cumulative_hours || 0).toFixed(1) + " hrs";
+      document.getElementById("trailer-status").innerText = data.trailer_status || "Offline";
+      document.getElementById("current-spot").innerText = data.current_spot || "Unknown Spot";
+      document.getElementById("trailer-duration").innerText = (data.trailer_hours_in_spot || 0).toFixed(1) + " hours";
+      document.getElementById("cumulative-impact").innerText = (data.cumulative_hours || 0).toFixed(1) + " hrs";
       
-      document.getElementById("active-blocker").innerText = telemetry.blocker_current_occupant || "Clear";
-      document.getElementById("blocker-duration").innerText = (telemetry.blocker_current_duration || 0).toFixed(1) + " hours";
-      document.getElementById("forward-status").innerText = telemetry.forward_spaces_status || "Empty";
-      document.getElementById("forward-activity").innerText = telemetry.forward_vehicles_activity || "None";
+      document.getElementById("active-blocker").innerText = data.blocker_current_occupant || "Clear";
+      document.getElementById("blocker-duration").innerText = (data.blocker_current_duration || 0).toFixed(1) + " hours";
+      document.getElementById("forward-status").innerText = data.forward_spaces_status || "Empty";
+      document.getElementById("forward-activity").innerText = data.forward_vehicles_activity || "None";
       
-      document.getElementById("v1-status").innerText = telemetry.blocker_v1_tesla || "Awaiting scan...";
-      document.getElementById("v2-status").innerText = telemetry.blocker_v2_gmc || "Awaiting scan...";
-      document.getElementById("v3-status").innerText = telemetry.blocker_v3_pickup || "Awaiting scan...";
-      document.getElementById("manifest-history").innerHTML = telemetry.blocker_previous || "No shuffles recorded.";
+      document.getElementById("v1-status").innerText = data.blocker_v1_tesla || "Awaiting scan...";
+      document.getElementById("v2-status").innerText = data.blocker_v2_gmc || "Awaiting scan...";
+      document.getElementById("v3-status").innerText = data.blocker_v3_pickup || "Awaiting scan...";
+      document.getElementById("manifest-history").innerHTML = data.blocker_previous || "No shuffles recorded.";
       
-      // Update global time counter
-      document.getElementById("sync-time").innerText = telemetry.sync_time || "--:--";
+      document.getElementById("sync-time").innerText = data.sync_time || "--:--";
 
-      // Reactive Video Evidence Capture rendering
       const videoContainer = document.getElementById("video-evidence-container");
-      const linkCheck = telemetry.real_world_analysis?.latest_event_video;
+      const linkCheck = data.real_world_analysis?.latest_event_video;
       
       if (linkCheck && linkCheck !== "unknown" && linkCheck !== "None") {
         videoContainer.innerHTML = `<a href="${linkCheck}" target="_blank" class="video-badge-btn">▶ Play Latest Shuffling Video Evidence</a>`;
@@ -259,14 +243,13 @@
       }
 
     } catch (error) {
-      console.error("CORS bypass failed:", error);
+      console.error("Watchdog stream synchronization failure:", error);
       document.getElementById("trailer-status").innerText = "Data Sync Delay...";
     }
   }
 
-  // Refresh every 15 seconds for true low-latency updates
   fetchLiveWatchdogData();
-  setInterval(fetchLiveWatchdogData, 15000);
+  setInterval(fetchLiveWatchdogData, 15000); // Low-latency 15-second tracking loop
 </script>
 
 </body>
