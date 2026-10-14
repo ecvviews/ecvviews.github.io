@@ -208,12 +208,15 @@
 <script>
   async function fetchLiveWatchdogData() {
     try {
-      const targetGistRawUrl = "https://github.com";
-      const response = await fetch(targetGistRawUrl);
-      if (!response.ok) throw new Error("API Gateway Timeout");
-      const telemetry = await response.json();
+      const masterGistApiUrl = "https://github.com";
+      const proxyUrl = "https://allorigins.win" + encodeURIComponent(masterGistApiUrl) + "&_nocache=" + new Date().getTime();
       
-      // Parse the nested JSON text directly out of the Gist files model
+      const response = await fetch(proxyUrl);
+      if (!response.ok) throw new Error("API Proxy Connection Failure");
+      const wrapper = await response.json();
+      
+      // Unpack the wrapper data container safely
+      const telemetry = JSON.parse(wrapper.contents);
       const data = JSON.parse(telemetry.files["street_stats.json"].content);
 
       document.getElementById("trailer-status").innerText = data.trailer_status || "Offline";
@@ -249,7 +252,7 @@
   }
 
   fetchLiveWatchdogData();
-  setInterval(fetchLiveWatchdogData, 15000); // Low-latency 15-second tracking loop
+  setInterval(fetchLiveWatchdogData, 15000); // Check updates every 15 seconds
 </script>
 
 </body>
