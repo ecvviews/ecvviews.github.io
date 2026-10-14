@@ -206,18 +206,12 @@
 </div>
 
 <script>
-  async function fetchLiveWatchdogData() {
+  // Clean JSONP response processing engine
+  function updateDashboard(gistData) {
     try {
-      // Bypassing API caching entirely by pulling the clean raw text endpoint directly
-      const rawGistUrl = "https://githubusercontent.com" + new Date().getTime();
-      const proxyUrl = "https://allorigins.win" + encodeURIComponent(rawGistUrl);
-      
-      const response = await fetch(proxyUrl);
-      if (!response.ok) throw new Error("Proxy connection down");
-      const wrapper = await response.json();
-      
-      // Parse the clean string metrics payload natively
-      const data = JSON.parse(wrapper.contents);
+      // Bypasses network wrapper constraints cleanly
+      const rawContent = gistData.files["street_stats.json"].content;
+      const data = JSON.parse(rawContent);
 
       document.getElementById("trailer-status").innerText = data.trailer_status || "Offline";
       document.getElementById("current-spot").innerText = data.current_spot || "Unknown Spot";
@@ -244,15 +238,27 @@
       } else {
         videoContainer.innerHTML = "";
       }
-
     } catch (error) {
-      console.error("Watchdog stream synchronization failure:", error);
-      document.getElementById("trailer-status").innerText = "Data Sync Delay...";
+      console.error("Dashboard update mapping failed:", error);
+      document.getElementById("trailer-status").innerText = "Data Structure Shift...";
     }
   }
 
-  fetchLiveWatchdogData();
-  setInterval(fetchLiveWatchdogData, 15000); // 15-second tracking interval
+  function loadGistDataNatively() {
+    // Standard cleanup of historical sync elements
+    const historicalScript = document.getElementById("gist-script-engine");
+    if (historicalScript) historicalScript.remove();
+
+    const script = document.createElement("script");
+    script.id = "gist-script-engine";
+    // Forcing GitHub to return the JSON structure wrapped inside our update handler function
+    script.src = "https://github.com" + new Date().getTime();
+    document.body.appendChild(script);
+  }
+
+  // Load immediately on page initialization and track changes sequentially
+  loadGistDataNatively();
+  setInterval(loadGistDataNatively, 20000); // Check updates every 20 seconds
 </script>
 
 </body>
