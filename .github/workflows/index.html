@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>East Castro Valley Watchdog Matrix</title>
+  <style>
+    :root {
+      --bg-color: #f8fafc;
+      --card-bg: #ffffff;
+      --border-color: #e2e8f0;
+      --text-main: #1e293b;
+      --text-muted: #64748b;
+      --alert-red: #ef4444;
+      --alert-bg: #fef2f2;
+      --alert-border: #fca5a5;
+      --accent-blue: #2563eb;
+      --success-green: #16a34a;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .matrix-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 24px;
+      width: 100%;
+      max-width: 520px;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+    }
+
+    .header-block {
+      border-bottom: 2px solid var(--border-color);
+      padding-bottom: 12px;
+      margin-bottom: 16px;
+    }
+
+    .header-title {
+      color: #991b1b;
+      font-size: 17px;
+      font-weight: 800;
+      text-transform: uppercase;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .header-sub {
+      color: var(--text-muted);
+      font-size: 12px;
+      margin: 4px 0 0 0;
+    }
+
+    .data-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      font-size: 14px;
+      border-bottom: 1px dashed var(--border-color);
+    }
+
+    .data-label {
+      font-weight: 600;
+      color: #334155;
+    }
+
+    .data-value {
+      font-weight: 700;
+      color: var(--accent-blue);
+    }
+
+    .alert-banner {
+      background: var(--alert-bg);
+      border-left: 4px solid var(--alert-red);
+      border-top: 1px solid var(--alert-border);
+      border-right: 1px solid var(--alert-border);
+      border-bottom: 1px solid var(--alert-border);
+      padding: 12px;
+      border-radius: 6px;
+      margin: 16px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .alert-text {
+      color: #991b1b;
+      font-weight: 700;
+      font-size: 13.5px;
+    }
+
+    .alert-badge {
+      background: var(--alert-red);
+      color: white;
+      padding: 3px 10px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .section-box {
+      border: 1px solid var(--border-color);
+      background: #f8fafc;
+      border-radius: 8px;
+      padding: 14px;
+      margin-top: 14px;
+    }
+
+    .section-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: #475569;
+      margin-top: 0;
+      margin-bottom: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .timeline-item {
+      font-size: 12.5px;
+      padding: 5px 0;
+      color: #334155;
+      display: flex;
+      align-items: flex-start;
+      gap: 6px;
+    }
+
+    .footer-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11.5px;
+      color: var(--text-muted);
+      margin-top: 20px;
+      padding-top: 10px;
+      border-top: 1px solid var(--border-color);
+    }
+
+    .sync-link {
+      color: var(--success-green);
+      font-weight: 700;
+      text-decoration: none;
+    }
+    .sync-link:hover {
+      text-decoration: underline;
+    }
+
+    .video-badge-btn {
+      display: inline-flex;
+      align-items: center;
+      background: #dc2626;
+      color: #ffffff;
+      padding: 6px 12px;
+      border-radius: 4px;
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 700;
+      margin-top: 10px;
+      border: 1px solid #b91c1c;
+      transition: background 0.15s ease;
+    }
+    .video-badge-btn:hover {
+      background: #b91c1c;
+    }
+  </style>
+</head>
+<body>
+
+<div class="matrix-card">
+  <div class="header-block">
+    <h2 class="header-title">⚠️ EAST CASTRO VALLEY WATCHDOG MATRIX</h2>
+    <div class="header-sub">Surveillance Telemetry & Blocker Fleet Ledger</div>
+  </div>
+
+  <!-- Primary Trailer Telemetry Cluster -->
+  <div class="data-row"><span class="data-label">Trailer Status:</span><span class="data-value" id="trailer-status" style="color: var(--text-main);">Syncing...</span></div>
+  <div class="data-row"><span class="data-label">Current Spot:</span><span class="data-value" id="current-spot" style="color: var(--text-muted);">Syncing...</span></div>
+  <div class="data-row"><span class="data-label">Trailer Current Duration:</span><span class="data-value" id="trailer-duration">0.0 hours</span></div>
+
+  <!-- Impact Banner -->
+  <div class="alert-banner">
+    <span class="alert-text">🚨 Cumulative Blockade Impact:</span>
+    <span class="alert-badge" id="cumulative-impact">0.0 hrs</span>
+  </div>
+
+  <!-- Blocker Fleet Active Manifest -->
+  <div class="data-row"><span class="data-label">Active Blocker Occupant:</span><span class="data-value" id="active-blocker" style="color: var(--alert-red);">Syncing...</span></div>
+  <div class="data-row"><span class="data-label">Blocker Stay Odometer:</span><span class="data-value" id="blocker-duration" style="color: var(--alert-red);">0.0 hours</span></div>
+  <div class="data-row"><span class="data-label">Forward Spaces Status:</span><span class="data-value" id="forward-status">Syncing...</span></div>
+  <div class="data-row"><span class="data-label">Forward Vehicles Activity:</span><span class="data-value" id="forward-activity">Syncing...</span></div>
+
+  <!-- Historical Inventory Registers -->
+  <div class="section-box">
+    <h4 class="section-title">📋 Historical Blocker Tracking Timelines</h4>
+    <div class="timeline-item">🔴 <span style="font-weight:600;">Vehicle 1 (Tesla):</span> <span id="v1-status">Syncing...</span></div>
+    <div class="timeline-item">🔵 <span style="font-weight:600;">Vehicle 2 (GMC):</span> <span id="v2-status">Syncing...</span></div>
+    <div class="timeline-item">🟢 <span style="font-weight:600;">Vehicle 3 (Truck):</span> <span id="v3-status">Syncing...</span></div>
+  </div>
+
+  <!-- Log Book Append Sub-Panel -->
+  <div class="section-box">
+    <h4 class="section-title">🔄 Shift Swap Manifest History</h4>
+    <div id="manifest-history" style="font-size:12.5px; color: #334155; line-height: 1.5;">Loading logs...</div>
+    <div id="video-evidence-container"></div>
+  </div>
+
+  <div class="footer-row">
+    <span>Feed Link: <a href="https://github.com" target="_blank" class="sync-link">Secure Gist Gateway</a></span>
+    <span>Last Sync: <span id="sync-time" style="font-weight:700;">--</span></span>
+  </div>
+</div>
+
+<script>
+  async function fetchLiveWatchdogData() {
+    try {
+      // Bypassing CORS constraints using direct data stream objects
+      const targetGistRawUrl = "https://githubusercontent.com" + new Date().getTime();
+      const response = await fetch(targetGistRawUrl);
+      if (!response.ok) throw new Error("API Gateway Timeout");
+      const telemetry = await response.json();
+
+      // Dynamic Node Injections
+      document.getElementById("trailer-status").innerText = telemetry.trailer_status || "Offline";
+      document.getElementById("current-spot").innerText = telemetry.current_spot || "Unknown Coordinates";
+      document.getElementById("trailer-duration").innerText = (telemetry.trailer_hours_in_spot || 0).toFixed(1) + " hours";
+      document.getElementById("cumulative-impact").innerText = (telemetry.cumulative_hours || 0).toFixed(1) + " hrs";
+      
+      document.getElementById("active-blocker").innerText = telemetry.blocker_current_occupant || "Clear";
+      document.getElementById("blocker-duration").innerText = (telemetry.blocker_current_duration || 0).toFixed(1) + " hours";
+      document.getElementById("forward-status").innerText = telemetry.forward_spaces_status || "Empty";
+      document.getElementById("forward-activity").innerText = telemetry.forward_vehicles_activity || "None";
+      
+      document.getElementById("v1-status").innerText = telemetry.blocker_v1_tesla || "Awaiting scan...";
+      document.getElementById("v2-status").innerText = telemetry.blocker_v2_gmc || "Awaiting scan...";
+      document.getElementById("v3-status").innerText = telemetry.blocker_v3_pickup || "Awaiting scan...";
+      document.getElementById("manifest-history").innerHTML = telemetry.blocker_previous || "No shuffles recorded.";
+      
+      // Update global time counter
+      document.getElementById("sync-time").innerText = telemetry.sync_time || "--:--";
+
+      // Reactive Video Evidence Capture rendering
+      const videoContainer = document.getElementById("video-evidence-container");
+      const linkCheck = telemetry.real_world_analysis?.latest_event_video;
+      
+      if (linkCheck && linkCheck !== "unknown" && linkCheck !== "None") {
+        videoContainer.innerHTML = `<a href="${linkCheck}" target="_blank" class="video-badge-btn">▶ Play Latest Shuffling Video Evidence</a>`;
+      } else {
+        videoContainer.innerHTML = "";
+      }
+
+    } catch (error) {
+      console.error("CORS bypass failed:", error);
+      document.getElementById("trailer-status").innerText = "Data Sync Delay...";
+    }
+  }
+
+  // Refresh every 15 seconds for true low-latency updates
+  fetchLiveWatchdogData();
+  setInterval(fetchLiveWatchdogData, 15000);
+</script>
+
+</body>
+</html>
